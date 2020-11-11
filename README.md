@@ -7,3 +7,5 @@ train_classifier.py in models folder is ML pipline.
 
 ![Web app screenshot 1](https://github.com/tbuyar/disaster_response_app/blob/main/web%20app%20screenshot1.JPG "Web app screenshot 1")
 ![Web app screenshot 2](https://github.com/tbuyar/disaster_response_app/blob/main/web%20app%20screenshot2.JPG "Web app screenshot 2")
+
+*This project is part of the Udacity Data Science Nanodegree program. Some of the codes were implemented by the instructions of the program.
