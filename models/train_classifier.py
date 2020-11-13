@@ -40,7 +40,7 @@ def tokenize(text):
     """ 
     tokenization function to process text data
     """
-    
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
     return [lemmatizer.lemmatize(token).lower().strip() for token in tokens]
