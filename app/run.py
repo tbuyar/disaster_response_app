@@ -34,7 +34,7 @@ df = pd.read_sql_table('data', engine)
 
 # load model
 
-model = joblib.load("classifier.pkl")
+model = joblib.load("./models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
