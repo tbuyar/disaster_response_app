@@ -28,27 +28,67 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 
 def load_data(database_filepath):
+    """ 
+    load data from database and assign input and output variables
+  
+    Parameters: 
+    database_filepath (str):  
+  
+    Returns: 
+    X (array): input variables
+    y (DataFrame): output variables
+    target_names (list): list of names of output variables
+  
+    """
+    # load data from database
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql('SELECT * FROM data', engine)
+    
+    # create input and output variables
     X = df["message"]
     y = df.drop(columns=["id","message", "original", "genre"])
-    print(X.shape, y.shape, y.columns.values)
-    return X, y, y.columns.values
+    
+    # create list which includes names of the output variables
+    target_names= y.columns.values
+
+    return X, y, target_names
 
 def tokenize(text):
-    
     """ 
-    tokenization function to process text data
+    tokenization and lemmatization of text after removing punctiations
+  
+    Parameters: 
+    text (str): text data 
+  
+    Returns: 
+    list: list of strings 
+  
     """
+    # removing punctiations and returning lower case
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+    
+    #tokenization
     tokens = word_tokenize(text)
+    
+    #lemmatization
     lemmatizer = WordNetLemmatizer()
+    
     return [lemmatizer.lemmatize(token).lower().strip() for token in tokens]
 
 def build_model():
+    """ 
+    tokenization and lemmatization of text after removing punctiations
+  
+    Parameters: 
+    None 
+  
+    Returns: 
+    cv (GridSearchCV): search specified parameter values for a pipeline as estimator
+  
+    """    
     
-    
-    # pipeline should take in the message column as input and output classification results on the other 36 categories in the dataset
+    # pipeline which takes in the message column as input and output classification results on the other 36 categories in the dataset
+    # our pipline consist of CountVectorizer, TfidfTransformer and MultiOutputClassifier (estimator is RandomForestClassifier)
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -61,12 +101,25 @@ def build_model():
               "tfidf__use_idf": (True, False)
                  }
 
-    cv = GridSearchCV(pipeline, param_grid = parameters)
+    cv = GridSearchCV(pipeline, parameters, cv=2, verbose=3)
     
     return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """ 
+    evaluate of efficiency of the model and print f1 score, precision and recall for each output category
+  
+    Parameters: 
+    model : trained model for prediction
+    X_test (array): input variables for testing 
+    Y_test (array): output variables for testing 
+    category_names (list): list of names of output variables 
+  
+    Returns: 
+    None
+  
+    """
     
     #prediction
     Y_pred = model.predict(X_test)
@@ -81,6 +134,17 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """ 
+    save the trained and evaluated model as pkl file
+  
+    Parameters: 
+    model : trained and evaluated model
+    model_filepath (str): file path to save the model
+    
+    Returns: 
+    None
+  
+    """
     pickle.dump(model.best_estimator_, open(model_filepath, 'wb'))
 
 
